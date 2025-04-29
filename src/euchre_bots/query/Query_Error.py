@@ -1,5 +1,6 @@
-
-class Query_Exception(Exception):
+# Query_Error.py
+# Query_Error.py
+class QueryError(Exception):
     def __init__(self, query, original_exception=None):
         self.query = query
         self.original_exception = original_exception

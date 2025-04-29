@@ -1,6 +1,6 @@
-
-
-class Query_Result():
+# Query_Result.py
+# Query_Result.py
+class QueryResult:
     def __init__(self, action, data, collection, reason):
         self.action = action
         self.data = data
@@ -9,6 +9,6 @@ class Query_Result():
 
     def __str__(self):
         return f"QueryResult({self.action}, {self.data}, {self.all}, '{self.reason}')"
-    
+
     def __repr__(self):
         return str(self)

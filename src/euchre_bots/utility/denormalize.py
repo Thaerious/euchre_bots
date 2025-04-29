@@ -1,4 +1,7 @@
+# denormalize.py
+# denormalize.py
 SUITS = ["♠", "♥", "♣", "♦"]
+
 
 def denormalize(list, trump):
     denorm = []
@@ -8,7 +11,7 @@ def denormalize(list, trump):
         "♠": trump,
         "♥": SUITS[(i + 1) % 4],
         "♣": SUITS[(i + 2) % 4],
-        "♦": SUITS[(i + 3) % 4]
+        "♦": SUITS[(i + 3) % 4],
     }
 
     for item in list:
@@ -16,5 +19,5 @@ def denormalize(list, trump):
         rank = string[:-1]
         suit = map[string[-1]]
         denorm.append(f"{rank}{suit}")
-    
+
     return denorm

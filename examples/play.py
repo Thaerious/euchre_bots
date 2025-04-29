@@ -1,0 +1,3 @@
+
+def play(game):
+    pass
