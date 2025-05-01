@@ -15,6 +15,12 @@ class CardSelectionSet(set):
     def size(self):
         return len(self)
 
+    def add(self, value):
+        if isinstance(value, int):
+            super().add(value)
+        else:
+            super().add(ORDER.inv[value])
+
     def copy(self):
         set = CardSelectionSet(self)
         set.trump = self.trump
@@ -51,6 +57,17 @@ class CardSelectionSet(set):
         fn = card_rank_factory(self.trump, lead)
         return min(self.as_card_strings(), key=fn)
 
+    def beats(self, theirs, lead = None):
+        fn = card_rank_factory(self.trump, lead)
+        beats = CardSelectionSet(trump=self.trump)
+        playable = self.playable(lead)
+
+        for mine in playable.as_card_strings():
+            if fn(mine) > fn(theirs):
+                beats.add(mine)
+
+        return beats
+
     def normalize(self, trump):
         norm = CardSelectionSet(trump=trump)
         shift = SUITS[trump] - SUITS[self.trump]
@@ -80,24 +97,31 @@ class CardSelectionSet(set):
         suits = re.findall(r"[♠♥♣♦]", phrase)
 
     def _select(self, phrase):
-        if phrase == "*":
-            self.update(range(24))
-            return
+        try:
+            if phrase == "*":
+                self.update(range(24))
+                return
 
-        ranks = re.findall(r"10|[9JQKAL]", phrase)
-        suits = re.findall(r"[♠♥♣♦]", phrase)
+            ranks = re.findall(r"10|[9JQKAL]", phrase)
+            suits = re.findall(r"[♠♥♣♦]", phrase)
 
-        fn = self.add
-        if phrase.startswith("~"): fn = self.remove
+            fn = self.add
+            if phrase.startswith("~"): fn = self.remove_if
 
-        if len(suits) == 0:
-            suits = SUITS.keys()
+            if len(suits) == 0:
+                suits = SUITS.keys()
 
-        if len(ranks) == 0:
-            for suit in suits: 
-                self._select_suit(suit, fn)
+            if len(ranks) == 0:
+                for suit in suits: 
+                    self._select_suit(suit, fn)
 
-        return self._iterate(ranks, suits, fn)
+            return self._iterate(ranks, suits, fn)
+        except Exception as ex:
+            raise Exception(f"Error with phrase '{phrase}'.") from ex
+
+    def remove_if(self, value):
+        if value in self:
+            self.remove(value)
 
     def _select_suit(self, suit, fn):
         ranks = list(RANKS.keys())
@@ -106,8 +130,7 @@ class CardSelectionSet(set):
         elif self.trump == COMPL[suit]:
             ranks.remove("J")
         
-        self._iterate(ranks, suit, fn)
-            
+        self._iterate(ranks, suit, fn)           
 
     def _iterate(self, ranks, suits, fn):
         for rank in ranks:

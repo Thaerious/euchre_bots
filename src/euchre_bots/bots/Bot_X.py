@@ -4,7 +4,7 @@ from ..query.Card_Selection_Set import CardSelectionSet as CSS
 from ..ABotInterface import ABotInterface
 from ..utility import allowed_suits
 
-class Bot_X4(ABotInterface):
+class Bot_X(ABotInterface):
     def decide(self, snapshot: Snapshot) -> tuple[str, object]:
         """
         Returns a tuple of action and either a Card or a suit (str) depending on state.

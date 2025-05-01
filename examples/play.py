@@ -30,10 +30,10 @@ class PlayManager:
         self.bot_list = bot_list
 
     def run(self, count):
+        names = list(self.bot_list.keys())
+
         for i in range(count):
-            names = list(self.bot_list.keys())
-            if random.randint(0, 1) == 1:
-                rotate(names)
+            rotate(names)            
             game = Game(names, seed=self.stats.seed + i)
             self.step(game)
 
@@ -57,7 +57,15 @@ class PlayManager:
                 bot = self.bot_list[name]
                 snapshot = Snapshot(game, game.current_player.name)
                 action = bot.decide(snapshot)
-                game.input(game.current_player.name, action[0], action[1])
+
+                try:
+                    game.input(game.current_player.name, action[0], action[1])
+                except:
+                    print("Action generated from:")
+                    for frame in bot.trace:
+                         print(f" - {frame.filename.split("/")[-1]}:{frame.lineno} in {frame.function}")
+                    print("")                         
+                    raise
 
         self.stats.games_played += 1
         if game.teams[0].score > game.teams[1].score:

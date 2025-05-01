@@ -12,5 +12,6 @@ from euchre_bots.query import CardSelectionSet as CSS
 # set = CSS("Q♥ 10♣ K♦").playable("♣")
 # print(set)
 
-set = CSS("♦", trump="♥")
+set = CSS("9JL♥ QK♣", trump="♥")
 print(set)
+print(set.beats("A♠", lead="♠"))
