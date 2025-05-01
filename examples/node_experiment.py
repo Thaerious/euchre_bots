@@ -1,5 +1,4 @@
 # node_experiment.py
-# node_experiment.py
 from euchre.card import Deck, Card
 from euchre import Game, Euchre
 from euchre_bots.utility import enumerate_actions
@@ -43,10 +42,10 @@ class Node:
         if self.game.teams[1].tricks >= 3:
             return self.freeze_node()
 
-        if self.game.current_state >= 7:
+        if self.game.state >= 7:
             return NodeCollection()       
 
-        while self.game.current_state >= 6:
+        while self.game.state >= 6:
             self.game.input(None, "continue", None)
 
         enumerated_actions = enumerate_actions(self.game)
@@ -65,7 +64,7 @@ class Node:
         return []
 
     def print(self, max_depth = 100, indent = 0):           
-        print("  " * indent, self.game.current_state, self.action_tuple, self.score, self.game.teams[0].tricks, self.game.teams[1].tricks)
+        print("  " * indent, self.game.state, self.action_tuple, self.score, self.game.teams[0].tricks, self.game.teams[1].tricks)
         if (max_depth <= indent): return
 
         for child in self.children:

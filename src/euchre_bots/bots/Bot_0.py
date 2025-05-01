@@ -76,10 +76,10 @@ class Bot0:
         Returns a tuple of action and either a Card or a suit (str) depending on state.
         """
         self.last_query = None
-        state: str = f"state_{snap.current_state}"
+        state: str = f"state_{snap.state}"
         (action, data) = self.decide_state(state, snap)
 
-        if snap.current_state in [3, 4]:
+        if snap.state in [3, 4]:
             if isinstance(data, Card):
                 data = data.suit
 

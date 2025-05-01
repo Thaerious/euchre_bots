@@ -1,5 +1,4 @@
 # temp.py
-# temp.py
 from euchre_bots.query.Card_Selection_Set import SUITS, RANKS
 
 print("{", end="")

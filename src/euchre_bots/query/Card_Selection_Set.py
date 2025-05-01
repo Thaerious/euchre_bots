@@ -24,7 +24,7 @@ class CardSelectionSet(set):
         if isinstance(phrase, str):
             for split in phrase.split():
                 self._select(split)
-        elif isinstance(phrase, int):            
+        elif isinstance(phrase, int):
                 self.add(phrase)
         elif isinstance(phrase, Iterable):
             for item in phrase:
@@ -40,7 +40,6 @@ class CardSelectionSet(set):
     def playable(self, lead):
         lead_set = CardSelectionSet(lead, trump=self.trump)
         playable = lead_set & self
-        print(f"{lead}: {playable} = {lead_set} & {self}")
         if len(playable) > 0: return playable
         return self.copy()
 
@@ -65,6 +64,21 @@ class CardSelectionSet(set):
             result = super().__and__(other)
             return CardSelectionSet(result)
 
+    def __contains__(self, o):
+        if isinstance(o, str):
+            o = ORDER.inv[o]
+        return super().__contains__(o)
+
+    def complement(self):
+        css = CardSelectionSet("*", trump=self.trump)
+        for idx in self:
+            css.remove(idx)
+        return css
+
+    def expand_phrase(self, phrase):
+        ranks = re.findall(r"10|[9JQKAL]", phrase)
+        suits = re.findall(r"[♠♥♣♦]", phrase)
+
     def _select(self, phrase):
         if phrase == "*":
             self.update(range(24))
@@ -80,12 +94,20 @@ class CardSelectionSet(set):
             suits = SUITS.keys()
 
         if len(ranks) == 0:
-            ranks = list(RANKS.keys())
-            if self.trump in suits:
-                ranks.append("L")
+            for suit in suits: 
+                self._select_suit(suit, fn)
 
-        print(ranks, suits)
         return self._iterate(ranks, suits, fn)
+
+    def _select_suit(self, suit, fn):
+        ranks = list(RANKS.keys())
+        if self.trump == suit:            
+            ranks.append("L")
+        elif self.trump == COMPL[suit]:
+            ranks.remove("J")
+        
+        self._iterate(ranks, suit, fn)
+            
 
     def _iterate(self, ranks, suits, fn):
         for rank in ranks:

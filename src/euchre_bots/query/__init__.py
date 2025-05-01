@@ -8,6 +8,7 @@ from .Query_Error import QueryError
 from .Query_Result import QueryResult
 from .Query_Stats import QueryStats
 from .compare_cards import winning_card, losing_card
+from .played import played
 __all__ = [
 	'CardSelectionSet', 'to_card_string', 'to_int',
 	'QueryPart', 'QueryDeck', 'QueryDigit', 'Query', 'normalize_value',
@@ -17,4 +18,5 @@ __all__ = [
 	'QueryResult',
 	'QueryStats',
 	'winning_card', 'losing_card',
+    'played'
 ]

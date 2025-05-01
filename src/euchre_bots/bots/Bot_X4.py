@@ -9,7 +9,7 @@ class Bot_X4(ABotInterface):
         """
         Returns a tuple of action and either a Card or a suit (str) depending on state.
         """
-        fnname = f"state_{snapshot.current_state}"
+        fnname = f"state_{snapshot.state}"
         method = getattr(self, fnname)
         return method(snapshot)
 
