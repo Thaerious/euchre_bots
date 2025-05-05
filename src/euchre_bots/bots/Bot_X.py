@@ -4,6 +4,9 @@ from ..query.Card_Selection_Set import CardSelectionSet as CSS
 from ..ABotInterface import ABotInterface
 from ..utility import allowed_suits
 
+# A basic place holder bot
+# Does not contain much logic
+
 class Bot_X(ABotInterface):
     def decide(self, snapshot: Snapshot) -> tuple[str, object]:
         """

@@ -7,6 +7,9 @@ from ..ABotInterface import ABotInterface
 from ..utility import allowed_suits
 import inspect
 
+# A simple bot that follows preset rules
+# Performs a little better that 1A1
+
 class Bot_1A2(ABotInterface):
     def decide(self, snap: Snapshot) -> tuple[str, object]:
         """

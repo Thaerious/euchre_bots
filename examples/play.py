@@ -15,29 +15,74 @@ class Stats:
         self.hands_played = 0
         self.games_played = 0
     
+    def eval(self, bot_class):
+        sum_games = 0
+        played_games = 0
+
+        for name, bot in self.bot_list.items():
+            if isinstance(bot, bot_class):
+                sum_games = sum_games + self.games_won[name]
+                played_games = played_games + self.games_played
+
+        if played_games == 0:
+            return 0
+        else:                
+            return sum_games / played_games
+
     def print(self):
-        headers = ["Name", "Tricks", "Hands", "Games"]
+        headers = ["Name", "Tricks", "Hands", "Games", "Eval"]
         data = [
-            [f"{name}:{type(self.bot_list[name]).__name__}", self.tricks_won[name], self.hands_won[name], self.games_won[name]]
+            [f"{name}:{type(self.bot_list[name]).__name__}", self.tricks_won[name], self.hands_won[name], self.games_won[name], self.eval(type(self.bot_list[name]))]
             for name in self.names
         ]
         data.append(["", self.tricks_played, self.hands_played, self.games_played])
         print(tabulate(data, headers=headers, tablefmt="grid"))
 
 class PlayManager:
-    def __init__(self, bot_list:list, seed):
+    def __init__(self, bot_list:list, seed = None):
+        """
+        Runs a series of Euchre games between bots and records performance data.
+
+        Attributes:
+            stats (Stats): Stores win statistics for all bots.
+            bot_list (dict): Maps bot names to bot instances.
+        """        
         self.stats = Stats(bot_list, seed)
         self.bot_list = bot_list
 
-    def run(self, count):
+    def run(self, args):
+        """
+        Executes a series of games, applying optional mirror mode (rotated seating).
+        
+        Args:
+            args (argparse.Namespace): Parsed CLI arguments with fields:
+                - args["count"] (int): number of games (or half, if args["mirror"]ed)
+                - args["mirror"] (bool): whether to repeat games with rotated seating
+        """        
+        self.args = args
         names = list(self.bot_list.keys())
+        count = args["count"]
+        if args.get("mirror"): count = (int)(count / 2)
 
         for i in range(count):
-            rotate(names)            
-            game = Game(names, seed=self.stats.seed + i)
+            rotate(names)
+            seed = None if self.stats.seed is None else self.stats.seed + i
+            game = Game(names, seed=seed)
             self.step(game)
 
+            if args.get("mirror"):
+                rotate(names)
+                game = Game(names, seed=seed)
+                self.step(game)
+
     def step(self, game: Game):
+        """
+        Executes one complete game, stepping through game states,
+        invoking bots, and updating statistics.
+
+        Args:
+            game (Game): The Euchre game instance to run.
+        """        
         game.input(None, "start")
         while game.state != 8:
             if game.state == 6:
@@ -75,7 +120,18 @@ class PlayManager:
             for player in game.teams[1].players:
                 self.stats.games_won[player.name] += 1            
 
-def play(bot_list:list, seed, count):
-    pm = PlayManager(bot_list, seed)
-    pm.run(count)
+def play(bot_list:list, args):
+    """
+    High-level helper to run multiple games and return summary statistics.
+
+    Args:
+        bot_list: dict mapping player names ("bot0", ..., "bot3") to bot instances
+        seed: starting random seed, or None
+        args: CLI args with 'count' and 'args["mirror"]' attributes
+
+    Returns:
+        Stats: aggregated game results.
+    """    
+    pm = PlayManager(bot_list, args.get("seed"))
+    pm.run(args)
     return pm.stats

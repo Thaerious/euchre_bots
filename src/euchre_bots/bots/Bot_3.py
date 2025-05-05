@@ -1,4 +1,4 @@
-# Bot_1A3.py
+# Bot_2.py
 from euchre import Snapshot
 from euchre.card import SUITS
 from ..query.Card_Selection_Set import CardSelectionSet as CSS
@@ -7,7 +7,13 @@ from ..ABotInterface import ABotInterface
 from ..utility import allowed_suits
 import inspect
 
-class Bot_1A3(ABotInterface):
+def short_suits(hand):
+    return sum(1 for s in SUITS if (hand & CSS(s)).size > 1)
+
+class Bot_3(ABotInterface):
+    def __init__(self, parameters):
+        self.param = parameters
+
     def decide(self, snap: Snapshot) -> tuple[str, object]:
         """
         Returns a tuple of action and either a Card or a suit (str) depending on state.
@@ -15,39 +21,24 @@ class Bot_1A3(ABotInterface):
         fnname = f"state_{snap.state}"
         method = getattr(self, fnname)
         tuple = method(snap)
-        return tuple
+        return tuple      
 
     def state_1(self, snap: Snapshot):
-        test = CSS("JLAKQ♠", trump="♠")
         hand = CSS(snap.hand, trump=snap.up_card.suit).normalize("♠")
+        strong = hand & CSS("JLA♠")
+        support = hand & CSS("KQ♠ A♦♣♥")
 
-        if snap.dealer.index == snap.for_index:
-            hand.select(snap.up_card)
-            
-        eval = test & hand
-
-        if (hand & CSS("♠ AK♦♣♥")).size == 5: 
+        if strong.size >= self.param[0] & support.size >= self.param[1]:
             return self.return_action("alone", None)
 
-        if eval.size >= 2: 
+        if strong.size >= self.param[2] & support.size >= self.param[3]:
             return self.return_action("order", None)
-        
+
         return self.return_action("pass", None)
 
     def state_2(self, snap: Snapshot):
         hand = CSS(snap.hand, trump=snap.up_card.suit)
         hand.select(snap.up_card)
-
-        one_of = CSS()
-        for suit in SUITS:            
-            if suit == snap.trump: continue
-            of_suit = hand & CSS(f"910JQKA{suit} ~L{snap.trump}", trump=snap.trump)
-            if of_suit.size == 1:
-                one_of.select(of_suit.worst())
-                
-        if one_of.size > 0:                
-            return self.return_action("up", one_of.worst())
-
         if hand.worst() == (str)(snap.up_card):
             return self.return_action("down", None)
         else:
@@ -61,8 +52,7 @@ class Bot_1A3(ABotInterface):
             hand = CSS(snap.hand, trump=suit).normalize("♠")
             if (hand & CSS("♠")).size < 3: continue
             if (hand & CSS("JLA♠")).size < 1: continue
-            if (hand & CSS("♠ AK♦♣♥")).size == 5: 
-                return self.return_action("alone", suit)
+            if (hand & CSS("♠ A♦♣♥")).size == 5: return self.return_action("alone", suit)
             return self.return_action("make", suit)
 
         return self.return_action("pass", None)
@@ -74,8 +64,7 @@ class Bot_1A3(ABotInterface):
             hand = CSS(snap.hand, trump=suit).normalize("♠")
             if (hand & CSS("♠")).size < 3: continue
             if (hand & CSS("JLA♠")).size < 1: continue
-            if (hand & CSS("♠ AK♦♣♥")).size == 5: 
-                return self.return_action("alone", suit)
+            if (hand & CSS("♠ A♦♣♥")).size == 5: return self.return_action("alone", suit)
             return self.return_action("make", suit)
 
         # otherwise choose the suit with the most cards
