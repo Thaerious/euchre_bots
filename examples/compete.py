@@ -12,8 +12,7 @@ args.add_argument("-s", "--seed", type=int, help="Set starting seed")
 args.add_argument("-m", "--mirror", action="store_true", help="Repeat each seed with rotated seating")
 args.add_argument("bots", nargs="*") 
 args = args.parse_args()
-
-args = vars(args)
+args = vars(args) # convert args to dict
 
 # list available bots when --list
 if args["list"]:

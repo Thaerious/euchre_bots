@@ -25,6 +25,9 @@ class Bot_3(ABotInterface):
 
     def state_1(self, snap: Snapshot):
         hand = CSS(snap.hand, trump=snap.up_card.suit).normalize("♠")
+        if snap.dealer.index == snap.for_index: 
+            hand.select(snap.up_card)   
+                 
         strong = hand & CSS("JLA♠")
         support = hand & CSS("KQ♠ A♦♣♥")
 

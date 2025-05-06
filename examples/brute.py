@@ -30,7 +30,7 @@ for combo in product(range(6), repeat=4):
         "bot_4": bots.Bot_3(combo),
     }
    
-    stats = play(bot_list, {"count": 30, "mirror": True})
+    stats = play(bot_list, {"count": 10, "mirror": True})
     score = stats.eval(bots.Bot_3)
     if score > best_score:
         print(score, combo)
