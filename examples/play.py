@@ -4,7 +4,18 @@ from tabulate import tabulate
 import random
 
 class Stats:
+    """
+    Tracks performance statistics for a set of Euchre bots across multiple games.
+    """
+    
     def __init__(self, bot_list:list, seed):
+        """
+        Initializes statistics tracking.
+
+        Args:
+            bot_list (dict): Mapping of player names to bot instances.
+            seed (int or None): Optional random seed to ensure reproducibility.
+        """        
         self.seed = seed
         self.bot_list = bot_list
         self.names = bot_list.keys()
@@ -16,6 +27,15 @@ class Stats:
         self.games_played = 0
     
     def eval(self, bot_class):
+        """
+        Computes average game win rate for all bots of a specific class.
+
+        Args:
+            bot_class (type): Bot class to evaluate (e.g., RandomBot, RuleBasedBot)
+
+        Returns:
+            float: Proportion of games won by bots of the specified class.
+        """        
         sum_games = 0
         played_games = 0
 
@@ -30,6 +50,9 @@ class Stats:
             return sum_games / played_games
 
     def print(self):
+        """
+        Outputs a formatted table summarizing bot performance statistics.
+        """        
         headers = ["Name", "Tricks", "Hands", "Games", "Eval"]
         data = [
             [f"{name}:{type(self.bot_list[name]).__name__}", self.tricks_won[name], self.hands_won[name], self.games_won[name], self.eval(type(self.bot_list[name]))]
@@ -108,7 +131,7 @@ class PlayManager:
                 except:
                     print("Action generated from:")
                     for frame in bot.trace:
-                         print(f" - {frame.filename.split("/")[-1]}:{frame.lineno} in {frame.function}")
+                         print(f" - {frame.filename.split('/')[-1]}:{frame.lineno} in {frame.function}")
                     print("")                         
                     raise
 

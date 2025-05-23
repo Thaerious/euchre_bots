@@ -1,9 +1,14 @@
+from mpi4py import MPI
 import argparse
 import random
 from itertools import product
-from mpi_evaluator import evaluator
+from mpi_evaluator import mpi_evaluator
 from Solution import Solution
 from util.flatten import flatten
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+mpi_process_cnt = comm.Get_size()
 
 args = argparse.ArgumentParser()
 args.add_argument("-p", "--pop_size", type=int, default=1, help="Population size")
@@ -26,10 +31,12 @@ def generate_solutions(count):
 
 if __name__ == "__main__":
     solutions = generate_solutions(args["pop_size"])
-    results = evaluator(solutions, args)
-    flat = flatten(solutions)
-    print(len(flat), len(solutions))
+    results = mpi_evaluator(solutions, args)
+    
+    if rank == 0:
+        flat = flatten(results)
+        print(f"number of processes = {mpi_process_cnt}")
 
-    with open('output.txt', 'w') as f:
-            for item in flat:
-                f.write(f"{item}\n")
+        with open('output.txt', 'w') as f:
+                for item in flat:
+                    f.write(f"{item}\n")

@@ -55,10 +55,12 @@ if __name__ == "__main__":
     features = product(range(6), repeat=4)
     features = list(features)
     split_features = split_list(features, size)
-
+    
     my_features = comm.scatter(split_features, root=0)
     my_results = eval(my_features)
     all_results = comm.gather(my_results, root=0)
+
+    
 
     if rank == 0:
         flat = []
@@ -68,3 +70,6 @@ if __name__ == "__main__":
 
         print(len(flat), len(features))
     
+        with open('output.txt', 'w') as f:
+            for item in flat:
+                f.write(f"{item}\n")
